@@ -1,0 +1,93 @@
+import java.util.*;
+public class SimpleReservationSystem 
+{
+    public static Map<String, String> users = new HashMap<>();
+    public static Map<String, String> reservations = new HashMap<>();
+    public static Scanner sc = new Scanner(System.in);
+    public static void main(String[] args) 
+    {
+        users.put("user1", "password1");
+        users.put("user2", "password2");
+        System.out.println("=== Login ===");
+        System.out.print("Enter username: ");
+        String username = sc.next();
+        System.out.print("Enter password: ");
+        String password = sc.next();
+        if (login(username, password)) 
+        {
+            System.out.println("Login successful!");
+            int option;
+            do 
+            {
+                System.out.println("\n1. Make a Reservation");
+                System.out.println("2. Cancel a Reservation");
+                System.out.println("3. Exit");
+                System.out.print("Choose an option: ");
+                option = sc.nextInt();
+                switch (option) 
+                {
+                    case 1:
+                        makeReservation();
+                        break;
+                    case 2:
+                        cancelReservation();
+                        break;
+                    case 3:
+                        System.out.println("Exiting...");
+                        break;
+                    default:
+                        System.out.println("Invalid option. Try again.");
+                }
+            } 
+            while (option != 3);
+        }
+        else
+        {
+            System.out.println("Invalid credentials. Exiting...");
+        }
+        sc.close();
+    }
+    public static boolean login(String username, String password)
+    {
+        return users.containsKey(username) && users.get(username).equals(password);
+    }
+    public static void makeReservation()
+    {
+        System.out.print("Enter your name: ");
+        String name = sc.next();
+        System.out.print("Enter Train Number: ");
+        String trainNumber = sc.next();
+        System.out.print("Enter Class (e.g., Sleeper, AC): ");
+        String trainClass = sc.next();
+        System.out.print("Enter Date of Journey (dd-mm-yyyy): ");
+        String date = sc.next();
+        String pnr = UUID.randomUUID().toString().substring(0, 8);
+        String reservationDetails = "Name: " + name + ", Train No: " + trainNumber + ", Class: " + trainClass + ", Date: " + date;
+        reservations.put(pnr, reservationDetails);
+        System.out.println("Reservation successful! Your PNR is: " + pnr);
+    }
+    public static void cancelReservation()
+    {
+        System.out.print("Enter PNR number: ");
+        String pnr = sc.next();
+        if (reservations.containsKey(pnr)) 
+        {
+            System.out.println("Reservation found: " + reservations.get(pnr));
+            System.out.print("Confirm cancellation (yes/no): ");
+            String confirm = sc.next();
+            if (confirm.equalsIgnoreCase("yes"))
+            {
+                reservations.remove(pnr);
+                System.out.println("Reservation cancelled.");
+            }
+            else
+            {
+                System.out.println("Cancellation aborted.");
+            }
+        }
+        else
+        {
+            System.out.println("PNR not found.");
+        }
+    }
+}
