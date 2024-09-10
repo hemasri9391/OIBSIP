@@ -1,0 +1,46 @@
+import java.util.Random;
+import java.util.Scanner;
+public class SimpleNumberGuessingGame
+{
+    public static void main(String[] args) 
+    {
+        Scanner scanner = new Scanner(System.in);
+        Random random = new Random();
+        final int LOWER_BOUND = 1;
+        final int UPPER_BOUND = 100;
+        final int MAX_ATTEMPTS = 10;
+        int targetNumber = random.nextInt(UPPER_BOUND - LOWER_BOUND + 1) + LOWER_BOUND;
+        int attempts = 0;
+        boolean hasGuessedCorrectly = false;
+        System.out.println("Guess the number between " + LOWER_BOUND + " and " + UPPER_BOUND + ".");
+        System.out.println("You have " + MAX_ATTEMPTS + " attempts.");
+        while (attempts < MAX_ATTEMPTS && !hasGuessedCorrectly) 
+        {
+            System.out.print("Enter your guess: ");
+            int guess = scanner.nextInt();
+            attempts++;
+            if (guess < LOWER_BOUND || guess > UPPER_BOUND) 
+            {
+                System.out.println("Please guess a number between " + LOWER_BOUND + " and " + UPPER_BOUND + ".");
+            }
+            else if (guess < targetNumber)
+            {
+                System.out.println("Too low!");
+            }
+            else if (guess > targetNumber) 
+            {
+                System.out.println("Too high!");
+            } 
+            else
+            {
+                hasGuessedCorrectly = true;
+                System.out.println("Congratulations! You guessed the number in " + attempts + " attempts.");
+            }
+        }
+        if (!hasGuessedCorrectly) 
+        {
+            System.out.println("Sorry, you've used all your attempts. The number was " + targetNumber + ".");
+        }
+        scanner.close();
+    }
+}
