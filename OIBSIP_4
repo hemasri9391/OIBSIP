@@ -1,0 +1,151 @@
+import java.util.*;
+public class OnlineExamination 
+{
+    public String username;
+    public String password;
+    public Map<String, String> profile;
+    public List<Question> questions;
+    public Scanner scanner;
+    public long startTime;
+    public final int EXAM_DURATION = 1 * 60 * 1000; 
+    public OnlineExamination() 
+    {
+        this.username = "user";
+        this.password = "pass";
+        this.profile = new HashMap<>();
+        this.profile.put("Name", "John Doe");
+        this.profile.put("Email", "john.doe@example.com");
+        this.questions = new ArrayList<>();
+        this.scanner = new Scanner(System.in);
+        populateQuestions();
+    }
+    private void populateQuestions() 
+    {
+        questions.add(new Question("What is the capital of France?", Arrays.asList("Paris", "London", "Rome", "Berlin"), 0));
+        questions.add(new Question("What is 2 + 2?", Arrays.asList("3", "4", "5", "6"), 1));
+    }
+    public void start()
+    {
+        if (login()) 
+        {
+            while (true) 
+            {
+                System.out.println("\n1. Update Profile and Password");
+                System.out.println("2. Start Exam");
+                System.out.println("3. Logout");
+                System.out.print("Choose an option: ");
+                int choice = scanner.nextInt();
+                scanner.nextLine(); 
+                switch (choice)
+                {
+                    case 1:
+                        updateProfileAndPassword();
+                        break;
+                    case 2:
+                        startExam();
+                        break;
+                    case 3:
+                        System.out.println("Logging out...");
+                        return;
+                    default:
+                        System.out.println("Invalid choice. Try again.");
+                }
+            }
+        } 
+        else
+        {
+            System.out.println("Login failed.");
+        }
+    }
+    public boolean login() 
+    {
+        System.out.print("Enter username: ");
+        String enteredUsername = scanner.nextLine();
+        System.out.print("Enter password: ");
+        String enteredPassword = scanner.nextLine();
+
+        return username.equals(enteredUsername) && password.equals(enteredPassword);
+    }
+    public void updateProfileAndPassword()
+    {
+        System.out.println("\nUpdate Profile:");
+        System.out.print("Enter new name: ");
+        profile.put("Name", scanner.nextLine());
+        System.out.print("Enter new email: ");
+        profile.put("Email", scanner.nextLine());
+        System.out.println("\nUpdate Password:");
+        System.out.print("Enter new password: ");
+        password = scanner.nextLine();
+        System.out.println("Profile and password updated successfully.");
+    }
+    public void startExam()
+    {
+        System.out.println("\nStarting exam...");
+        startTime = System.currentTimeMillis();
+        Map<Integer, Integer> answers = new HashMap<>();
+        for (int i = 0; i < questions.size(); i++)
+        {
+            Question question = questions.get(i);
+            System.out.println("\n" + (i + 1) + ". " + question.getQuestionText());
+            List<String> options = question.getOptions();
+            for (int j = 0; j < options.size(); j++) 
+            {
+                System.out.println((j + 1) + ". " + options.get(j));
+            }
+            System.out.print("Select an option (1-" + options.size() + "): ");
+            int answer = scanner.nextInt() - 1;
+            scanner.nextLine(); 
+            answers.put(i, answer);
+        }
+        long timeElapsed = System.currentTimeMillis() - startTime;
+        if (timeElapsed > EXAM_DURATION) 
+        {
+            System.out.println("Time's up!");
+        }
+        submitExam(answers);
+    }
+    public void submitExam(Map<Integer, Integer> answers)
+    {
+        int score = 0;
+        for (Map.Entry<Integer, Integer> entry : answers.entrySet()) 
+        {
+            int questionIndex = entry.getKey();
+            int selectedOption = entry.getValue();
+            if (questions.get(questionIndex).getCorrectAnswerIndex() == selectedOption)
+            {
+                score++;
+            }
+        }
+        System.out.println("\nExam submitted.");
+        System.out.println("Your score: " + score + "/" + questions.size());
+    }
+    public static void main(String[] args) 
+    {
+        OnlineExamination exam = new OnlineExamination();
+        exam.start();
+    }
+}
+class Question
+{
+    private String questionText;
+    private List<String> options;
+    private int correctAnswerIndex;
+    public Question(String questionText, List<String> options, int correctAnswerIndex)
+    {
+        this.questionText = questionText;
+        this.options = options;
+        this.correctAnswerIndex = correctAnswerIndex;
+    }
+    public String getQuestionText()
+    {
+        return questionText;
+    }
+    public List<String> getOptions() 
+    {
+        return options;
+    }
+    public int getCorrectAnswerIndex() 
+    '{
+        return correctAnswerIndex;
+    }
+}
