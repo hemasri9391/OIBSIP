@@ -1,0 +1,315 @@
+import java.util.*;
+public class DigitalLibraryManagement
+{
+    public static void main(String[] args) 
+    {
+        Library library = new Library();
+        library.start();
+    }
+}
+class Library
+{
+    public List<Book> books;
+    public List<User> users;
+    public Map<User, List<Book>> issuedBooks;
+    public Scanner scanner;
+    public boolean isAdminLoggedIn;
+    public Library()
+    {
+        this.books = new ArrayList<>();
+        this.users = new ArrayList<>();
+        this.issuedBooks = new HashMap<>();
+        this.scanner = new Scanner(System.in);
+        this.isAdminLoggedIn = false;
+        initializeLibrary();
+    }
+    private void initializeLibrary()
+    {
+        books.add(new Book("The Great Gatsby", "F. Scott Fitzgerald", "Fiction"));
+        books.add(new Book("To Kill a Mockingbird", "Harper Lee", "Fiction"));
+        books.add(new Book("1984", "George Orwell", "Dystopian"));
+        users.add(new User("user1", "password1"));
+        users.add(new User("user2", "password2"));
+    }
+    public void start() 
+    {
+        while (true)
+        {
+            System.out.println("1. Admin Login");
+            System.out.println("2. User Login");
+            System.out.println("3. Exit");
+            System.out.print("Choose an option: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); 
+            switch (choice) 
+            {
+                case 1:
+                    adminLogin();
+                    break;
+                case 2:
+                    userLogin();
+                    break;
+                case 3:
+                    System.out.println("Exiting...");
+                    return;
+                default:
+                    System.out.println("Invalid choice. Try again.");
+            }
+        }
+    }
+    public void adminLogin()
+    {
+        System.out.print("Enter Admin Username: ");
+        String username = scanner.nextLine();
+        System.out.print("Enter Admin Password: ");
+        String password = scanner.nextLine();
+        if (username.equals("admin") && password.equals("admin"))
+        {
+            isAdminLoggedIn = true;
+            adminMenu();
+        } 
+        else 
+        {
+            System.out.println("Invalid admin credentials.");
+        }
+    }
+    public void adminMenu()
+    {
+        while (isAdminLoggedIn) 
+        {
+            System.out.println("\nAdmin Menu:");
+            System.out.println("1. Add Book");
+            System.out.println("2. Remove Book");
+            System.out.println("3. Update Book");
+            System.out.println("4. View All Books");
+            System.out.println("5. Logout");
+            System.out.print("Choose an option: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); 
+            switch (choice)
+            {
+                case 1:
+                    addBook();
+                    break;
+                case 2:
+                    removeBook();
+                    break;
+                case 3:
+                    updateBook();
+                    break;
+                case 4:
+                    viewAllBooks();
+                    break;
+                case 5:
+                    isAdminLoggedIn = false;
+                    System.out.println("Admin logged out.");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Try again.");
+            }
+        }
+    }
+    public void addBook()
+    {
+        System.out.print("Enter book title: ");
+        String title = scanner.nextLine();
+        System.out.print("Enter author: ");
+        String author = scanner.nextLine();
+        System.out.print("Enter category: ");
+        String category = scanner.nextLine();
+        books.add(new Book(title, author, category));
+        System.out.println("Book added successfully.");
+    }
+    public void removeBook() 
+    {
+        System.out.print("Enter book title to remove: ");
+        String title = scanner.nextLine();
+        books.removeIf(book -> book.getTitle().equalsIgnoreCase(title));
+        System.out.println("Book removed successfully.");
+    }
+    public void updateBook()
+    {
+        System.out.print("Enter book title to update: ");
+        String title = scanner.nextLine();
+        for (Book book : books) 
+        {
+            if (book.getTitle().equalsIgnoreCase(title))
+            {
+                System.out.print("Enter new author: ");
+                book.setAuthor(scanner.nextLine());
+                System.out.print("Enter new category: ");
+                book.setCategory(scanner.nextLine());
+                System.out.println("Book updated successfully.");
+                return;
+            }
+        }
+        System.out.println("Book not found.");
+    }
+    public void viewAllBooks()
+    {
+        System.out.println("\nAll Books:");
+        for (Book book : books) 
+        {
+            System.out.println(book);
+        }
+    }
+    public void userLogin()
+    {
+        System.out.print("Enter Username: ");
+        String username = scanner.nextLine();
+        System.out.print("Enter Password: ");
+        String password = scanner.nextLine();
+        User user = authenticateUser(username, password);
+        if (user != null)
+        {
+            userMenu(user);
+        }
+        else
+        {
+            System.out.println("Invalid user credentials.");
+        }
+    }
+    public User authenticateUser(String username, String password)
+    {
+        for (User user : users)
+        {
+            if (user.getUsername().equals(username) && user.getPassword().equals(password))
+            {
+                return user;
+            }
+        }
+        return null;
+    }
+    public void userMenu(User user)
+    {
+        while (true)
+        {
+            System.out.println("\nUser Menu:");
+            System.out.println("1. View All Books");
+            System.out.println("2. Issue Book");
+            System.out.println("3. Return Book");
+            System.out.println("4. Logout");
+            System.out.print("Choose an option: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); 
+            switch (choice) 
+            {
+                case 1:
+                    viewAllBooks();
+                    break;
+                case 2:
+                    issueBook(user);
+                    break;
+                case 3:
+                    returnBook(user);
+                    break;
+                case 4:
+                    System.out.println("User logged out.");
+                    return;
+                default:
+                    System.out.println("Invalid choice. Try again.");
+            }
+        }
+    }
+    public void issueBook(User user)
+    {
+        System.out.print("Enter book title to issue: ");
+        String title = scanner.nextLine();
+        for (Book book : books) 
+        {
+            if (book.getTitle().equalsIgnoreCase(title))
+            {
+                if (!issuedBooks.containsKey(user)) 
+                {
+                    issuedBooks.put(user, new ArrayList<>());
+                }
+                issuedBooks.get(user).add(book);
+                System.out.println("Book issued successfully.");
+                return;
+            }
+        }
+        System.out.println("Book not found.");
+    }
+    public void returnBook(User user)
+    {
+        if (issuedBooks.containsKey(user))
+        {
+            System.out.print("Enter book title to return: ");
+            String title = scanner.nextLine();
+            List<Book> userBooks = issuedBooks.get(user);
+            for (Iterator<Book> iterator = userBooks.iterator(); iterator.hasNext(); ) 
+            {
+                Book book = iterator.next();
+                if (book.getTitle().equalsIgnoreCase(title)) 
+                {
+                    iterator.remove();
+                    System.out.println("Book returned successfully.");
+                    return;
+                }
+            }
+            System.out.println("Book not found in issued list.");
+        }
+        else
+        {
+            System.out.println("No books issued to this user.");
+        }
+    }
+}
+class Book 
+{
+    private String title;
+    private String author;
+    private String category;
+    public Book(String title, String author, String category) 
+    {
+        this.title = title;
+        this.author = author;
+        this.category = category;
+    }
+    public String getTitle()
+    {
+        return title;
+    }
+    public void setTitle(String title) 
+    {
+        this.title = title;
+    }
+    public String getAuthor()
+    {
+        return author;
+    }
+    public void setAuthor(String author) 
+    {
+        this.author = author;
+    }
+    public String getCategory() 
+    {
+        return category;
+    }
+    public void setCategory(String category)
+    {
+        this.category = category;
+    }
+    public String toString()
+    {
+        return "Title: " + title + ", Author: " + author + ", Category: " + category;
+    }
+}
+class User 
+{
+    private String username;
+    private String password;
+    public User(String username, String password)
+    {
+        this.username = username;
+        this.password = password;
+    }
+    public String getUsername() 
+    {
+        return username;
+    }
+    public String getPassword() 
+    {
+        return password;
+    }
+}
